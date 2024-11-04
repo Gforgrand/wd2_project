@@ -47,7 +47,12 @@
         <li><a href="insert.php">Add Card</a></li>
     </ul>
     <?php while($row = $statement->fetch()): ?>
-        <p><?= $row['cardname'] ?> <?= $row['power'] ?>/<?= $row['toughness'] ?></p>
+        <p>
+            <?= $row['cardname'] ?>
+            <?php if (!empty($row['power']) || !empty($row['toughness'])): ?>
+                <?= $row['power'] ?>/<?= $row['toughness'] ?>
+            <?php endif ?>
+        </p>
     <?php endwhile ?>
 </body>
 </html>
