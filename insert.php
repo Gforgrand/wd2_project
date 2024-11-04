@@ -15,29 +15,25 @@
     $statement_cardtypes = $db->prepare($query_cardtypes);
     $statement_cardtypes->execute();
 
-    /*
     $query_manacolours = "SELECT * FROM manacolours";
     $statement_manacolours = $db->prepare($query_manacolours);
     $statement_manacolours->execute();
-    */
 
-    /*
     $query_cardsets = "SELECT * FROM cardsets";
     $statement_cardsets = $db->prepare($query_cardsets);
     $statement_cardsets->execute();
-    */
 
     if(
         $_POST
         && !empty(trim($_POST['cardname']))
-        //&& !empty(trim($_POST['cardtypename']))
-        //&& !empty(trim($_POST['cardsetname']))
+        && !empty(trim($_POST['cardtype']))
+        && !empty(trim($_POST['cardset']))
         ) {
 
         $cardname = filter_input(INPUT_POST, 'cardname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $cardtypeid = filter_input(INPUT_POST, 'cardtype', FILTER_VALIDATE_INT);
-        //$colourid = filter_input(INPUT_POST, 'colourname', FILTER_VALIDATE_INT);
-        //$cardsetid = filter_input(INPUT_POST, 'cardsetname', FILTER_VALIDATE_INT);
+        $manaid = filter_input(INPUT_POST, 'colourname', FILTER_VALIDATE_INT);
+        $cardsetid = filter_input(INPUT_POST, 'cardset', FILTER_VALIDATE_INT);
         $power = filter_input(INPUT_POST, 'power', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $toughness = filter_input(INPUT_POST, 'toughness', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
@@ -58,7 +54,7 @@
                 }
             }
 
-            if (!$cardtype_exists) {
+            if (!$exists) {
                 $query = "INSERT INTO cardtypes (cardtypename) VALUES (:cardtypename)";
                 $statement = $db->prepare($query);
                 $statement->bindValue(':cardtypename', $new);
@@ -67,7 +63,32 @@
             }
         }
 
-        /*
+        //card cost
+        if ($_POST['colourname'] == 'new' && !empty(trim($_POST['newcolourname']))) {
+            $new = filter_input(INPUT_POST, 'newcolourname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $query = "SELECT manaid FROM manacolours WHERE colourname = :colourname";
+            $statement = $db->prepare($query);
+            $statement->bindValue(':colourname', $new);
+            $statement->execute();
+
+            $exists = false;
+            while ($row = $statement->fetch()) {
+                if ($row['manaid']) {
+                    $exists = true;
+                    $manaid = $row['manaid'];
+                    break;
+                }
+            }
+
+            if (!$exists) {
+                $query = "INSERT INTO manacolours (colourname) VALUES (:colourname)";
+                $statement = $db->prepare($query);
+                $statement->bindValue(':colourname', $new);
+                $statement->execute();
+                $manaid = $db->lastInsertId();
+            }
+        }
+
         //set
         if ($_POST['cardset'] == 'new' && !empty(trim($_POST['newcardset']))) {
             $new = filter_input(INPUT_POST, 'newcardset', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -86,25 +107,49 @@
             }
 
             if (!$exists) {
-                $query = "INSERT INTO cardsets (cardsetname) VALUES (:cardsetname)";
+                $query = "INSERT INTO cardsets (cardsetname) VALUES (:cardset)";
                 $statement = $db->prepare($query);
-                $statement->bindValue(':cardsetname', $new);
+                $statement->bindValue(':cardset', $new);
                 $statement->execute();
                 $cardtypeid = $db->lastInsertId();
             }
         }
-        */
 
-        $query = "INSERT INTO cards (cardname, cardtypeid, power, toughness) VALUES (:cardname, :cardtypeid, :power, :toughness)";
-        $statement = $db->prepare($query);
-        $statement->bindValue(':cardname', $cardname);
-        $statement->bindValue(':cardtypeid', $cardtypeid);
-        $statement->bindValue(':power', $power);
-        $statement->bindValue(':toughness', $toughness);
+        try {
+            $db->beginTransaction();
 
-        if ($statement->execute()) {
+            $query = "INSERT INTO cards (cardname, cardtypeid, power, toughness) VALUES (:cardname, :cardtypeid, :power, :toughness)";
+            $statement = $db->prepare($query);
+            $statement->bindValue(':cardname', $cardname);
+            $statement->bindValue(':cardtypeid', $cardtypeid);
+            $statement->bindValue(':power', $power);
+            $statement->bindValue(':toughness', $toughness);
+            $statement->execute();
+            
+            $cardid = $db->lastInsertId();
+            
+            $query = "INSERT INTO cardsetcards (cardid, cardsetid) VALUES (:cardid, :cardsetid)";
+            $statement = $db->prepare($query);
+            $statement->bindValue(':cardid', $cardid);
+            $statement->bindValue(':cardsetid', $cardsetid);
+            $statement->execute();
+
+            if ($manaid) {
+                $query = "INSERT INTO cardcosts (cardid, manaid) VALUES (:cardid, :manaid)";
+                $statement = $db->prepare($query);
+                $statement->bindValue(':cardid', $cardid);
+                $statement->bindValue(':manaid', $manaid);
+                $statement->execute();
+            }
+
+            $db->commit();
+
             header("Location: index.php?success");
             exit;
+        
+        } catch (Exception $exception) {
+            $db->rollBack();
+            echo "Transaction failed: " . $exception->getMessage();
         }
     }
 ?>
@@ -141,6 +186,32 @@
             <p>
                 <label for="newcardtype">New Cardtype</label>
                 <input type="text" id="newcardtype" name="newcardtype">
+            </p>
+            <p>
+                <label for="colourname">Card Cost</label>
+                <select name="colourname" id="colourname">
+                    <?php while($row = $statement_manacolours->fetch()): ?>
+                        <option value="<?= $row['manaid'] ?>"><?= $row['colourname'] ?></option>
+                    <?php endwhile ?>
+                    <option value="new">Add New Card Cost</option>
+                </select>
+            </p>
+            <p>
+                <label for="newcolourname">New Card Cost</label>
+                <input type="text" id="newcolourname" name="newcolourname">
+            </p>
+            <p>
+                <label for="cardset">Set</label>
+                <select name="cardset" id="cardset">
+                    <?php while($row = $statement_cardsets->fetch()): ?>
+                        <option value="<?= $row['cardsetid'] ?>"><?= $row['cardsetname'] ?></option>
+                    <?php endwhile ?>
+                    <option value="new">Add New Set</option>
+                </select>
+            </p>
+            <p>
+                <label for="newcardset">New Set</label>
+                <input type="text" id="newcardset" name="newcardset">
             </p>
             <p>
                 <label for="power">Power</label>
