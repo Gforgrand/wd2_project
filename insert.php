@@ -30,7 +30,7 @@
     if(
         $_POST
         && !empty(trim($_POST['cardname']))
-        && !empty(trim($_POST['cardtypename']))
+        //&& !empty(trim($_POST['cardtypename']))
         //&& !empty(trim($_POST['cardsetname']))
         ) {
 
@@ -142,34 +142,6 @@
                 <label for="newcardtype">New Cardtype</label>
                 <input type="text" id="newcardtype" name="newcardtype">
             </p>
-            <!--
-            <p>
-                <label for="colourname">Card Cost</label>
-                <select name="colourname" id="colourname">
-                    <?php //while($row = $statement_manacolours->fetch()): ?>
-                        <option value="<?= //$row['manaid'] ?>"><?= //$row['colourname'] ?></option>
-                    <?php //endwhile ?>
-                    <option value="new">Add New Card Cost</option>
-                </select>
-            </p>
-            <p>
-                <label for="newcolourname">New Card Cost</label>
-                <input type="text" id="newcolourname" name="newcolourname">
-            </p>
-            <p>
-                <label for="cardsetname">Set</label>
-                <select name="cardsetname" id="cardsetname">
-                    <?php //while($row = $statement_cardsets->fetch()): ?>
-                        <option value="<?= //$row['cardsetid'] ?>"><?= //$row['cardsetname'] ?></option>
-                    <?php //endwhile ?>
-                    <option value="new">Add New Set</option>
-                </select>
-            </p>
-            <p>
-                <label for="newcardsetname">New Set</label>
-                <input type="text" id="newcardsetname" name="newcardsetname">
-            </p>
-            -->
             <p>
                 <label for="power">Power</label>
                 <textarea id="power" name="power"></textarea>

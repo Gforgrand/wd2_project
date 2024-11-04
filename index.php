@@ -36,7 +36,7 @@
                 <p>The Magic gathers!</p>
             <?php endif ?>
             <?php if (null !== $deleted): ?>
-                <p>The Magic disipates...</p>
+                <p>The Magic dissipates...</p>
             <?php endif ?>
             <?php if (null !== $updated): ?>
                 <p>The Magic is in flux!</p>
@@ -48,9 +48,8 @@
             <li><a href="insert.php">Add Card</a></li>
         </ul>
         <?php while($row = $statement->fetch()): ?>
-            <h2><a href="show.php?id=<?= $row['CardID'] ?>"><?= $row['CardName'] ?></a></h2>
-            <p><small><a href="edit.php?id=<?= $row['CardID'] ?>">edit</a></small></p>
-            <p><?= $row['content'] ?></p>
+            <p><?= $row['cardname'] ?></p>
+            <p><small><a href="edit.php?id=<?= $row['cardid'] ?>">edit</a></small></p>
         <?php endwhile ?>
     </div>
 </body>
