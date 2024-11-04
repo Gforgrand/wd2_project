@@ -49,7 +49,8 @@
         </ul>
         <?php while($row = $statement->fetch()): ?>
             <p><?= $row['cardname'] ?></p>
-            <p><small><a href="edit.php?id=<?= $row['cardid'] ?>">edit</a></small></p>
+            <p><?= $row['power'] ?></p>
+            <p><?= $row['toughness'] ?></p>
         <?php endwhile ?>
     </div>
 </body>
