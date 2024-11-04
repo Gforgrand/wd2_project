@@ -30,28 +30,24 @@
     <title>Welcome to the Magic: The Gathering Content Management System!</title>
 </head>
 <body>
-    <div id="wrapper">
-        <div id="header">
-            <?php if (null !==$success): ?>
-                <p>The Magic gathers!</p>
-            <?php endif ?>
-            <?php if (null !== $deleted): ?>
-                <p>The Magic dissipates...</p>
-            <?php endif ?>
-            <?php if (null !== $updated): ?>
-                <p>The Magic is in flux!</p>
-            <?php endif ?>
-            <h1><a href="index.php">Magic: The Gathering Content Management System</a></h1>
-        </div>
-        <ul id="menu">
-            <li><a href="index.php" class="active">Home</a></li>
-            <li><a href="insert.php">Add Card</a></li>
-        </ul>
-        <?php while($row = $statement->fetch()): ?>
-            <p><?= $row['cardname'] ?></p>
-            <p><?= $row['power'] ?></p>
-            <p><?= $row['toughness'] ?></p>
-        <?php endwhile ?>
+    <div id="header">
+        <?php if (null !==$success): ?>
+            <p>The Magic gathers!</p>
+        <?php endif ?>
+        <?php if (null !== $deleted): ?>
+            <p>The Magic dissipates...</p>
+        <?php endif ?>
+        <?php if (null !== $updated): ?>
+            <p>The Magic is in flux!</p>
+        <?php endif ?>
+        <h1><a href="index.php">Magic: The Gathering Content Management System</a></h1>
     </div>
+    <ul id="menu">
+        <li><a href="index.php" class="active">Home</a></li>
+        <li><a href="insert.php">Add Card</a></li>
+    </ul>
+    <?php while($row = $statement->fetch()): ?>
+        <p><?= $row['cardname'] ?> <?= $row['power'] ?>/<?= $row['toughness'] ?></p>
+    <?php endwhile ?>
 </body>
 </html>
