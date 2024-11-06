@@ -32,7 +32,7 @@
 
             $query = "SELECT $fieldid FROM $table WHERE $fieldname = :$fieldname";
             $statement = $db->prepare($query);
-            $statement->bindValue(":$fieldname", $new);
+            $statement->bindValue(":$fieldname", $new, PDO::PARAM_STR);
             $statement->execute();
 
             $exists = false;
@@ -49,7 +49,7 @@
             if (!$exists) {
                 $query = "INSERT INTO $table ($fieldname) VALUES (:$fieldname)";
                 $statement = $db->prepare($query);
-                $statement->bindValue(":$fieldname", $new);
+                $statement->bindValue(":$fieldname", $new, PDO::PARAM_STR);
                 $statement->execute();
                 $id = $db->lastInsertId();
             }
@@ -78,25 +78,25 @@
 
             $query = "INSERT INTO cards (cardname, cardtypeid, power, toughness) VALUES (:cardname, :cardtypeid, :power, :toughness)";
             $statement = $db->prepare($query);
-            $statement->bindValue(':cardname', $cardname);
-            $statement->bindValue(':cardtypeid', $cardtypeid);
-            $statement->bindValue(':power', $power);
-            $statement->bindValue(':toughness', $toughness);
+            $statement->bindValue(':cardname', $cardname, PDO::PARAM_STR);
+            $statement->bindValue(':cardtypeid', $cardtypeid, PDO::PARAM_INT);
+            $statement->bindValue(':power', $power, PDO::PARAM_STR);
+            $statement->bindValue(':toughness', $toughness, PDO::PARAM_STR);
             $statement->execute();
             
             $cardid = $db->lastInsertId();
             
             $query = "INSERT INTO cardsetcards (cardid, cardsetid) VALUES (:cardid, :cardsetid)";
             $statement = $db->prepare($query);
-            $statement->bindValue(':cardid', $cardid);
-            $statement->bindValue(':cardsetid', $cardsetid);
+            $statement->bindValue(':cardid', $cardid), PDO::PARAM_INT;
+            $statement->bindValue(':cardsetid', $cardsetid, PDO::PARAM_INT);
             $statement->execute();
 
             if ($manaid) {
                 $query = "INSERT INTO cardcosts (cardid, manaid) VALUES (:cardid, :manaid)";
                 $statement = $db->prepare($query);
-                $statement->bindValue(':cardid', $cardid);
-                $statement->bindValue(':manaid', $manaid);
+                $statement->bindValue(':cardid', $cardid, PDO::PARAM_INT);
+                $statement->bindValue(':manaid', $manaid, PDO::PARAM_INT);
                 $statement->execute();
             }
 
