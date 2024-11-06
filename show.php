@@ -4,7 +4,7 @@
     
     Name: Gregory Rennie
     Date: November 6, 2024
-    Description: Project - Magic: The Gathering CMS Index PHP
+    Description: Project - Magic: The Gathering CMS Show PHP
 
 ****************/
 
