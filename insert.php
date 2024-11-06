@@ -24,10 +24,10 @@
     $statement_cardsets->execute();
 
     if(
-        $_POST
-        && !empty(trim($_POST['cardname']))
-        && !empty(trim($_POST['cardtype']))
-        && !empty(trim($_POST['cardset']))
+        $_POST &&
+        !empty(trim($_POST['cardname'])) &&
+        !empty(trim($_POST['cardtype'])) &&
+        !empty(trim($_POST['cardset']))
         ) {
 
         $cardname = filter_input(INPUT_POST, 'cardname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -222,7 +222,12 @@
                 <textarea id="toughness" name="toughness"></textarea>
             </p>
             <input type="submit">
-            <?php if ($_POST && empty(trim($_POST['cardname']))): ?>
+            <?php if (
+                $_POST &&
+                empty(trim($_POST['cardname'])) &&
+                empty(trim($_POST['cardtypename'])) &&
+                empty(trim($_POST['cardsetname']))
+            ): ?>
                 <p class="warning">The Card Name, Cardtype, and Set must each contain at least 1 non-whitespace character.</p>
             <?php endif ?>
         </fieldset>
