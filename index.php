@@ -47,12 +47,8 @@
         <li><a href="insert.php">Add Card</a></li>
     </ul>
     <?php while($row = $statement->fetch()): ?>
-        <p>
-            <?= $row['cardname'] ?>
-            <?php if (!empty($row['power']) || !empty($row['toughness'])): ?>
-                <?= $row['power'] ?>/<?= $row['toughness'] ?>
-            <?php endif ?>
-        </p>
+        <h2><a href="show.php?cardid=<?= $row['cardid'] ?>"><?= $row['cardname'] ?></a></h2>
+        <p><small><a href="edit.php?cardid=<?= $row['cardid'] ?>">edit</a></small></p>
     <?php endwhile ?>
 </body>
 </html>
