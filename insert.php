@@ -10,6 +10,7 @@
 
     require('connect.php');
     require('authenticate.php');
+    require('get_or_create.php');
 
     $query_cardtypes = "SELECT * FROM cardtypes";
     $statement_cardtypes = $db->prepare($query_cardtypes);
@@ -23,40 +24,7 @@
     $statement_cardsets = $db->prepare($query_cardsets);
     $statement_cardsets->execute();
 
-    function get_or_create($db, $table, $fieldid, $fieldname, $value) {
-
-        $id = filter_input(INPUT_POST, $fieldname, FILTER_VALIDATE_INT);
-
-        if ($_POST[$fieldname] == 'new' && !empty(trim($_POST[$value]))) {
-            $new = filter_input(INPUT_POST, $value, FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-
-            $query = "SELECT $fieldid FROM $table WHERE $fieldname = :$fieldname";
-            $statement = $db->prepare($query);
-            $statement->bindValue(":$fieldname", $new, PDO::PARAM_STR);
-            $statement->execute();
-
-            $exists = false;
-            $id = null;
-
-            while ($row = $statement->fetch()) {
-                if ($row[$fieldid]) {
-                    $exists = true;
-                    $id = $row[$fieldid];
-                    break;
-                }
-            }
-
-            if (!$exists) {
-                $query = "INSERT INTO $table ($fieldname) VALUES (:$fieldname)";
-                $statement = $db->prepare($query);
-                $statement->bindValue(":$fieldname", $new, PDO::PARAM_STR);
-                $statement->execute();
-                $id = $db->lastInsertId();
-            }
-        }
-
-        return $id;
-    }
+    
 
     if(
         $_POST &&
