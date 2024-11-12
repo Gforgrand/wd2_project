@@ -13,11 +13,11 @@ require('connect.php');
 $u_error = $ps_error = $level_error = "";
 $error_flag = false;
 
-if ($POST) {
+if ($POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']))) {
     $username = filter_input(INPUT_POST, 'username', FILTER_VALIDATE_EMAIL);
     $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $confirmpassword = filter_input(INPUT_POST, 'confirmpassword', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $userlevel = filter_input(INPUT_POST, 'accesslevel', FILTER_SANITIZE_NUMBER_INT);
+    $userlevel = filter_input(INPUT_POST, 'userlevel', FILTER_SANITIZE_NUMBER_INT);
 
     if ($password !== $confirmpassword) {
         $ps_error = "Passwords do not match. Please ensure passwords match to continue.";
@@ -41,7 +41,7 @@ if ($POST) {
 
     if (!$error_flag) {
         try{
-            
+
             $password = password_hash($password, PASSWORD_DEFAULT);
 
             $query = "INSERT INTO users (username, password, userlevel) VALUES (:username, :password, :userlevel)";
@@ -75,16 +75,16 @@ if ($POST) {
         <fieldset>
             <p>
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username">
+                <input type="text" id="username" name="username" required>
                 <?= $u_error ?>
             </p>
             <p>
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password">
+                <input type="password" id="password" name="password" required>
             </p>
             <p>
                 <label for="confirmpassword">Confirm Password</label>
-                <input type="password" id="confirmpassword" name="confirmpassword">
+                <input type="password" id="confirmpassword" name="confirmpassword" required>
                 <?= $ps_error ?>
             </p>
             <p>User Level</p>
