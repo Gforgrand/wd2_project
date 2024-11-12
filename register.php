@@ -35,12 +35,14 @@ if ($POST) {
     }
 
     if (empty($_POST['userlevel'])) {
-        $level_error = "Please select a User Level";
+        $level_error = "Please select a User Level.";
         $error_flag = true;
     }
 
     if (!$error_flag) {
         try{
+            
+            $password = password_hash($password, PASSWORD_DEFAULT);
 
             $query = "INSERT INTO users (username, password, userlevel) VALUES (:username, :password, :userlevel)";
             $statement = $db->prepare($query);
