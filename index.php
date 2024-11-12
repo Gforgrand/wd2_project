@@ -14,7 +14,11 @@
     $deleted = filter_input(INPUT_GET,'deleted', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $updated = filter_input(INPUT_GET,'updated', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
-    $query = "SELECT * FROM Cards";
+    $query =
+        "SELECT c.cardid, c.cardname, cs.cardsetname
+        FROM cards c
+        JOIN cardsetcards csc ON c.cardid = csc.cardid
+        JOIN cardsets cs ON csc.cardsetid = cs.cardsetid";
     $statement = $db->prepare($query);
     $statement->execute();
 
@@ -48,6 +52,7 @@
     </ul>
     <?php while($row = $statement->fetch()): ?>
         <h2><a href="show.php?cardid=<?= $row['cardid'] ?>"><?= $row['cardname'] ?></a></h2>
+        <p>Set: <?= $row['cardsetname']?></p>
         <p><small><a href="edit.php?cardid=<?= $row['cardid'] ?>">edit</a></small></p>
     <?php endwhile ?>
 </body>
