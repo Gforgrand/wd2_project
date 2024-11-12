@@ -49,6 +49,8 @@
     <ul id="menu">
         <li><a href="index.php" class="active">Home</a></li>
         <li><a href="insert.php">Add Card</a></li>
+        <li><a href="login.php">Login</a></li>
+        <li><a href="register.php">Register</a></li>
     </ul>
     <?php while($row = $statement->fetch()): ?>
         <h2><a href="show.php?cardid=<?= $row['cardid'] ?>"><?= $row['cardname'] ?></a></h2>
