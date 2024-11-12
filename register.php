@@ -13,7 +13,7 @@ require('connect.php');
 $u_error = $ps_error = $level_error = "";
 $error_flag = false;
 
-if ($POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']))) {
+if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']))) {
     $username = filter_input(INPUT_POST, 'username', FILTER_VALIDATE_EMAIL);
     $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $confirmpassword = filter_input(INPUT_POST, 'confirmpassword', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -51,7 +51,7 @@ if ($POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password'])
             $statement->bindValue(':userlevel', $userlevel, PDO::PARAM_INT);
             $statement->execute();
     
-            header("Location: index.php");
+            header("Location: index.php?registered");
             exit;
 
         } catch (Exception $exception) {

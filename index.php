@@ -18,6 +18,8 @@
     $loggedin = filter_input(INPUT_GET,'loggedin', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $loggedout = filter_input(INPUT_GET,'loggedout', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $accessdenied = filter_input(INPUT_GET,'accessdenied', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $registered = filter_input(INPUT_GET,'registered', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+
 
     $query =
         "SELECT c.cardid, c.cardname, cs.cardsetname
@@ -26,6 +28,15 @@
         JOIN cardsets cs ON csc.cardsetid = cs.cardsetid";
     $statement = $db->prepare($query);
     $statement->execute();
+
+    $messages = [
+        ['condition' => $success, 'message' => "The Magic gathers!"],
+        ['condition' => $deleted, 'message' => "The Magic dissipates..."],
+        ['condition' => $updated, 'message' => "The Magic is in flux!"],
+        ['condition' => $loggedin, 'message' => "Login successful!"],
+        ['condition' => $loggedout, 'message' => "Logout successful!"],
+        ['condition' => $registered, 'message' => "Thank you for registering!"]
+    ];
 
 ?>
 
@@ -40,24 +51,11 @@
 </head>
 <body>
     <div id="header">
-        <?php if (null !==$success): ?>
-            <p>The Magic gathers!</p>
-        <?php endif ?>
-        <?php if (null !== $deleted): ?>
-            <p>The Magic dissipates...</p>
-        <?php endif ?>
-        <?php if (null !== $updated): ?>
-            <p>The Magic is in flux!</p>
-        <?php endif ?>
-        <?php if (null !== $loggedin): ?>
-            <p>Login successful!</p>
-        <?php endif ?>
-        <?php if (null !== $loggedout): ?>
-            <p>Logout successful!</p>
-        <?php endif ?>
-        <?php if (null !== $accessdenied): ?>
-            <p>You do not have permission to access this. Please log in with the appropriate credentials.</p>
-        <?php endif ?>
+        <?php foreach ($messages as $message): ?>
+            <?php if (null !==$message['condition']): ?>
+                <p><?= $message['message'] ?></p>
+            <?php endif ?>
+        <?php endforeach ?>
         <h1><a href="index.php">Magic: The Gathering Content Management System</a></h1>
     </div>
     <ul id="menu">
@@ -75,5 +73,10 @@
             <p><small><a href="edit.php?cardid=<?= $row['cardid'] ?>">edit</a></small></p>
         <?php endif ?>
     <?php endwhile ?>
+    <?php if (null !== $accessdenied): ?>
+        <script>
+            alert("You do not have permission to access this. Please log in with the appropriate credentials.");
+        </script>
+    <?php endif ?>
 </body>
 </html>

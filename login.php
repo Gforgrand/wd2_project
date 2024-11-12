@@ -14,7 +14,7 @@ require('connect.php');
 
 $login_error = "";
 
-if ($POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']))) {
+if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']))) {
     $username = filter_input(INPUT_POST, 'username', FILTER_VALIDATE_EMAIL);
     $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
