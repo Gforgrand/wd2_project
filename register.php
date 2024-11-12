@@ -90,15 +90,15 @@ if ($POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password'])
             <p>User Level</p>
             <ul>
                 <li>
-                    <input type="radio" id="commenter" name="userlevel" value="1">
+                    <input type="radio" id="commenter" name="userlevel" value="10">
                     <label for="commenter">Commenter</label>
                 </li>
                 <li>
-                    <input type="radio" id="contributor" name="userlevel" value="10">
+                    <input type="radio" id="contributor" name="userlevel" value="20">
                     <label for="contributor">Contributor</label>
                 </li>
                 <li>
-                    <input type="radio" id="admin" name="userlevel" value="100">
+                    <input type="radio" id="admin" name="userlevel" value="30">
                     <label for="admin">Administrator</label>
                 </li>
             </ul>
