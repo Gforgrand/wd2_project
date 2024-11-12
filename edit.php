@@ -8,9 +8,15 @@
 
 ****************/
 
+    session_start();
+    
     require('connect.php');
-    require('authenticate.php');
     require('get_or_create.php');
+
+    if (!isset($_SESSION['userlevel']) || $_SESSION['userlevel'] < 20) {
+        header("Location: index.php?accessdenied");
+        exit;
+    }
 
     $query_cardtypes = "SELECT * FROM cardtypes";
     $statement_cardtypes = $db->prepare($query_cardtypes);
