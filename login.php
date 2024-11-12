@@ -30,7 +30,7 @@ if ($POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password'])
         $_SESSION['username'] = $user['username'];
         $_SESSION['userlevel'] = $user['userlevel'];
         
-        header("Location: index.php?login=success");
+        header("Location: index.php?login");
         exit;
 
     } else {
