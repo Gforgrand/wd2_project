@@ -24,8 +24,6 @@
     $statement_cardsets = $db->prepare($query_cardsets);
     $statement_cardsets->execute();
 
-    
-
     if(
         $_POST &&
         !empty(trim($_POST['cardname'])) &&
