@@ -56,7 +56,7 @@
             
             $query = "INSERT INTO cardsetcards (cardid, cardsetid) VALUES (:cardid, :cardsetid)";
             $statement = $db->prepare($query);
-            $statement->bindValue(':cardid', $cardid), PDO::PARAM_INT;
+            $statement->bindValue(':cardid', $cardid, PDO::PARAM_INT);
             $statement->bindValue(':cardsetid', $cardsetid, PDO::PARAM_INT);
             $statement->execute();
 
