@@ -19,6 +19,7 @@
     $loggedout = filter_input(INPUT_GET,'loggedout', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $accessdenied = filter_input(INPUT_GET,'accessdenied', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $registered = filter_input(INPUT_GET,'registered', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $usermgmt = filter_input(INPUT_GET,'managed', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
 
     $query =
@@ -60,10 +61,16 @@
     </div>
     <ul id="menu">
         <li><a href="index.php" class="active">Home</a></li>
-        <li><a href="login.php">Login</a></li>
-        <li><a href="register.php">Register</a></li>
+        <?php if (!isset($_SESSION['username'])): ?>
+            <li><a href="login.php">Login</a> / <a href="register.php">Register</a></li>
+        <?php else: ?>
+            <li><a href="logout.php">Logout</a></li>
+        <?php endif ?>
         <?php if (isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 20): ?>
             <li><a href="insert.php">Add Card</a></li>
+        <?php endif ?>
+        <?php if (isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+            <li><a href="users.php">User Management</a></li>
         <?php endif ?>
     </ul>
     <?php while($row = $statement->fetch()): ?>
@@ -76,6 +83,11 @@
     <?php if (null !== $accessdenied): ?>
         <script>
             alert("You do not have permission to access this. Please log in with the appropriate credentials.");
+        </script>
+    <?php endif ?>
+    <?php if (null !== $usermgmt): ?>
+        <script>
+            alert("User modified.");
         </script>
     <?php endif ?>
 </body>
