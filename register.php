@@ -10,9 +10,52 @@
 
 require('connect.php');
 
-if ($POST && ) {
-    $query = "INSERT INTO users (username, confirmpassword) VALUES (:username, :confirmpassword)";
+$u_error = $ps_error = $level_error = "";
+$error_flag = false;
+
+if ($POST) {
+    $username = filter_input(INPUT_POST, 'username', FILTER_VALIDATE_EMAIL);
+    $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $confirmpassword = filter_input(INPUT_POST, 'confirmpassword', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $userlevel = filter_input(INPUT_POST, 'accesslevel', FILTER_SANITIZE_NUMBER_INT);
+
+    if ($password !== $confirmpassword) {
+        $ps_error = "Passwords do not match. Please ensure passwords match to continue.";
+        $error_flag = true;
+    }
+
+    $query = "SELECT COUNT(*) FROM users WHERE username = :username";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':username', $username, PDO::PARAM_STR);
+    $statement->execute();
+
+    if ($statement->fetchColumn() > 0) {
+        $u_error = "This username is not available. Please select a different username.";
+        $error_flag = true;
+    }
+
+    if (empty($_POST['userlevel'])) {
+        $level_error = "Please select a User Level";
+        $error_flag = true;
+    }
+
+    if (!$error_flag) {
+        try{
+
+            $query = "INSERT INTO users (username, password, userlevel) VALUES (:username, :password, :userlevel)";
+            $statement = $db->prepare($query);
+            $statement->bindValue(':username', $username, PDO::PARAM_STR);
+            $statement->bindValue(':password', $password, PDO::PARAM_STR);
+            $statement->bindValue(':userlevel', $userlevel, PDO::PARAM_INT);
+            $statement->execute();
     
+            header("Location: index.php");
+            exit;
+
+        } catch (Exception $exception) {
+            echo $exception->getMessage();
+        }
+    }
 }
 
 ?>
@@ -28,12 +71,36 @@ if ($POST && ) {
     <a href="index.php">Home</a>
     <form method="post">
         <fieldset>
-            <label for="username">Username</label>
-            <input type="text" id="username" name="username">
-            <label for="password">Password</label>
-            <input type="password" id="password" name="password">
-            <label for="confirmpassword">Confirm Password</label>
-            <input type="password" id="confirmpassword" name="confirmpassword">
+            <p>
+                <label for="username">Username</label>
+                <input type="text" id="username" name="username">
+                <?= $u_error ?>
+            </p>
+            <p>
+                <label for="password">Password</label>
+                <input type="password" id="password" name="password">
+            </p>
+            <p>
+                <label for="confirmpassword">Confirm Password</label>
+                <input type="password" id="confirmpassword" name="confirmpassword">
+                <?= $ps_error ?>
+            </p>
+            <p>User Level</p>
+            <ul>
+                <li>
+                    <input type="radio" id="commenter" name="userlevel" value="1">
+                    <label for="commenter">Commenter</label>
+                </li>
+                <li>
+                    <input type="radio" id="contributor" name="userlevel" value="10">
+                    <label for="contributor">Contributor</label>
+                </li>
+                <li>
+                    <input type="radio" id="admin" name="userlevel" value="100">
+                    <label for="admin">Administrator</label>
+                </li>
+            </ul>
+            <input type="submit" value="Register"><?= $level_error ?>
         </fieldset>
     </form>
 </body>
