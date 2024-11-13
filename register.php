@@ -87,21 +87,14 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
                 <input type="password" id="confirmpassword" name="confirmpassword" required>
                 <?= $ps_error ?>
             </p>
-            <p>User Level</p>
-            <ul>
-                <li>
-                    <input type="radio" id="commenter" name="userlevel" value="10">
-                    <label for="commenter">Commenter</label>
-                </li>
-                <li>
-                    <input type="radio" id="contributor" name="userlevel" value="20">
-                    <label for="contributor">Contributor</label>
-                </li>
-                <li>
-                    <input type="radio" id="admin" name="userlevel" value="30">
-                    <label for="admin">Administrator</label>
-                </li>
-            </ul>
+            <p>
+                <label for="userlevel">User Level</label>
+                <select name="userlevel" id="userlevel">
+                    <option value="10">Commenter (10)</option>
+                    <option value="20">Contributor (20)</option>
+                    <option value="30">Administrator (30)</option>
+                </select>
+            </p>
             <input type="submit" value="Register"><?= $level_error ?>
         </fieldset>
     </form>
