@@ -110,39 +110,51 @@
                     <?php while($row = $statement_cardtypes->fetch()): ?>
                         <option value="<?= $row['cardtypeid'] ?>"><?= $row['cardtypename'] ?></option>
                     <?php endwhile ?>
-                    <option value="new">Add New Cardtype</option>
+                    <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                        <option value="new">Add New Cardtype</option>
+                    <?php endif ?>
                 </select>
             </p>
-            <p>
-                <label for="newcardtype">New Cardtype</label>
-                <input type="text" id="newcardtype" name="newcardtype">
-            </p>
+            <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                <p>
+                    <label for="newcardtype">New Cardtype</label>
+                    <input type="text" id="newcardtype" name="newcardtype">
+                </p>
+            <?php endif ?>
             <p>
                 <label for="colourname">Card Cost</label>
                 <select name="colourname" id="colourname">
                     <?php while($row = $statement_manacolours->fetch()): ?>
                         <option value="<?= $row['manaid'] ?>"><?= $row['colourname'] ?></option>
                     <?php endwhile ?>
-                    <option value="new">Add New Card Cost</option>
+                    <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                        <option value="new">Add New Card Cost</option>
+                    <?php endif ?>
                 </select>
             </p>
-            <p>
-                <label for="newcolourname">New Card Cost</label>
-                <input type="text" id="newcolourname" name="newcolourname">
-            </p>
+            <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                <p>
+                    <label for="newcolourname">New Card Cost</label>
+                    <input type="text" id="newcolourname" name="newcolourname">
+                </p>
+            <?php endif ?>
             <p>
                 <label for="cardsetname">Set</label>
                 <select name="cardsetname" id="cardsetname">
                     <?php while($row = $statement_cardsets->fetch()): ?>
                         <option value="<?= $row['cardsetid'] ?>"><?= $row['cardsetname'] ?></option>
                     <?php endwhile ?>
-                    <option value="new">Add New Set</option>
+                    <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                        <option value="new">Add New Set</option>
+                    <?php endif ?>
                 </select>
             </p>
-            <p>
-                <label for="newcardset">New Set</label>
-                <input type="text" id="newcardset" name="newcardset">
-            </p>
+            <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                <p>
+                    <label for="newcardset">New Set</label>
+                    <input type="text" id="newcardset" name="newcardset">
+                </p>
+            <?php endif ?>
             <p>
                 <label for="power">Power</label>
                 <textarea id="power" name="power"></textarea>
