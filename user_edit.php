@@ -17,22 +17,38 @@ if (!isset($_SESSION['userlevel']) || $_SESSION['userlevel'] < 30) {
     exit;
 }
 
+$u_error = $ps_error = $level_error = "";
 $error_flag = false;
+
 if ($_POST &&
     isset($_POST['userlevel']) &&
     !empty(trim($_POST['userlevel'])) &&
     isset($_POST['userid'])) {
 
     $userid = filter_input(INPUT_POST,'userid', FILTER_SANITIZE_NUMBER_INT);
+    $username = filter_input(INPUT_POST, 'username', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $userlevel = filter_input(INPUT_POST, 'userlevel', FILTER_SANITIZE_NUMBER_INT);
     $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $confirmpassword = filter_input(INPUT_POST, 'confirmpassword', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
     if ($password !== $confirmpassword) {
+        $ps_error = "Passwords do not match. Please ensure passwords match to continue.";
+        $error_flag = true;
+    }
+
+    $query = "SELECT COUNT(*) FROM users WHERE username = :username AND userid != :userid";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userid', $userid, PDO::PARAM_INT);
+    $statement->bindValue(':username', $username, PDO::PARAM_STR);
+    $statement->execute();
+
+    if ($statement->fetchColumn() > 0) {
+        $u_error = "This username is not available. Please select a different username.";
         $error_flag = true;
     }
 
     if (empty($_POST['userlevel']) || $_POST['userlevel'] > 30 || $_POST['userlevel'] < 1) {
+        $level_error = "Please select a User Level.";
         $error_flag = true;
     }
 
@@ -55,39 +71,30 @@ if ($_POST &&
 
     // UPDATES
     if (!$error_flag) {
-        if (!empty($password) || !empty($confirmpassword)) {
-            try {
+        try {
+            if (!empty($password) || !empty($confirmpassword)) {
 
                 $password = password_hash($password, PASSWORD_DEFAULT);
                 
-                $query = "UPDATE users SET password = :password, userlevel = :userlevel WHERE userid = :userid";
+                $query = "UPDATE users SET password = :password WHERE userid = :userid";
                 $statement = $db->prepare($query);
                 $statement->bindValue(':userid', $userid, PDO::PARAM_INT);
                 $statement->bindValue(':password', $password, PDO::PARAM_STR);
-                $statement->bindValue(':userlevel', $userlevel, PDO::PARAM_INT);
                 $statement->execute();
-    
-                header("Location: users.php");
-                exit;
-            
-            } catch (Exception $exception) {
-                echo "Update failed: " . $exception->getMessage();
             }
-        } else {
-            try {
-                
-                $query = "UPDATE users SET userlevel = :userlevel WHERE userid = :userid";
-                $statement = $db->prepare($query);
-                $statement->bindValue(':userid', $userid, PDO::PARAM_INT);
-                $statement->bindValue(':userlevel', $userlevel, PDO::PARAM_INT);
-                $statement->execute();
-    
-                header("Location: users.php");
-                exit;
-            
-            } catch (Exception $exception) {
-                echo "Update failed: " . $exception->getMessage();
-            }
+                    
+            $query = "UPDATE users SET username = :username, userlevel = :userlevel WHERE userid = :userid";
+            $statement = $db->prepare($query);
+            $statement->bindValue(':userid', $userid, PDO::PARAM_INT);
+            $statement->bindValue(':username', $username, PDO::PARAM_STR);
+            $statement->bindValue(':userlevel', $userlevel, PDO::PARAM_INT);
+            $statement->execute();
+
+            header("Location: users.php");
+            exit;
+        
+        } catch (Exception $exception) {
+            echo "Update failed: " . $exception->getMessage();
         }
     }
     
@@ -102,8 +109,6 @@ if ($_POST &&
 
 } else {
     $userid = false;
-    header("Location: users.php");
-    exit;
 }
 
 ?>
@@ -121,7 +126,11 @@ if ($_POST &&
         <form method="post">
             <fieldset>
                 <input type="hidden" name="userid" value="<?= $post['userid'] ?>">
-                <p>Username: <?= $post['username'] ?></p>
+                <p>
+                    <label for="username">Username</label>
+                    <input type="text" id="username" name="username" value="<?= $post['username'] ?>"required>
+                    <?= $u_error ?>
+                </p>
                 <p>
                     <label for="password">Password</label>
                     <input type="password" id="password" name="password" placeholder="Use existing password">
@@ -132,16 +141,18 @@ if ($_POST &&
                 </p>
                 <p>
                     <label for="userlevel">User Level</label>
-                    <input type="text" id="userlevel" name="userlevel" value="<?= $post['userlevel'] ?>" required>
+                    <select name="userlevel" id="userlevel">
+                        <option value="10" <?= 10 == $post['userlevel'] ? 'selected' : '' ?>>Commenter (10)</option>
+                        <option value="20" <?= 20 == $post['userlevel'] ? 'selected' : '' ?>>Contributor (20)</option>
+                        <option value="30" <?= 30 == $post['userlevel'] ? 'selected' : '' ?>>Administrator (30)</option>
+                    </select>
                 </p>
-                <input type="submit" value="Update">
-                <button type="submit" name="delete" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                <p>
+                    <input type="submit" value="Update">
+                    <button type="submit" name="delete" onclick="return confirm('Are you sure you want to delete this user?')">Delete</button>
+                </p>
             </fieldset>
         </form>
-    <?php else: ?>
-        <script>
-            alert("Invalid modification. Passwords in both fields must match, and the user level must be between 1 and 30.")
-        </script>
     <?php endif ?>
 </body>
 </html>
