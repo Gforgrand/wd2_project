@@ -70,6 +70,7 @@
         <?php endif ?>
         <?php if (isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
             <li><a href="users.php">User Management</a></li>
+            <li><a href="categories.php">Categories</a></li>
         <?php endif ?>
     </ul>
     <?php while($row = $statement->fetch()): ?>
