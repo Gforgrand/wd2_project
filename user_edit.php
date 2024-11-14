@@ -17,10 +17,43 @@ if (!isset($_SESSION['userlevel']) || $_SESSION['userlevel'] < 30) {
     exit;
 }
 
-$u_error = $ps_error = $level_error = "";
+$u_error = $ps_error = $username = "";
 $error_flag = false;
+$userid = false;
+
+if(isset($_GET['userid'])) {
+    $userid = filter_input(INPUT_GET,'userid', FILTER_SANITIZE_NUMBER_INT);
+
+    $query = "SELECT * FROM users WHERE userid = :userid LIMIT 1";
+    $statement = $db->prepare($query);
+    $statement->bindValue(':userid', $userid, PDO::PARAM_INT);
+    $statement->execute();
+    $post = $statement->fetch();
+
+    // DELETIONS
+    if(isset($_POST['delete'])) {
+
+        $userid = filter_input(INPUT_POST,'userid', FILTER_SANITIZE_NUMBER_INT);
+
+        try {
+            
+            $query = "DELETE FROM users WHERE userid = :userid";
+            $statement = $db->prepare($query);
+            $statement->bindValue(':userid', $userid, PDO::PARAM_INT);
+            $statement->execute();
+
+            header("Location: users.php");
+            exit;
+
+        } catch (Exception $exception) {
+            echo "Deletion failed: " . $exception->getMessage();
+        }
+    }
+}
 
 if ($_POST &&
+    isset($_POST['username']) &&
+    !empty(trim($_POST['username'])) &&
     isset($_POST['userlevel']) &&
     !empty(trim($_POST['userlevel'])) &&
     isset($_POST['userid'])) {
@@ -45,28 +78,6 @@ if ($_POST &&
     if ($statement->fetchColumn() > 0) {
         $u_error = "This username is not available. Please select a different username.";
         $error_flag = true;
-    }
-
-    if (empty($_POST['userlevel']) || $_POST['userlevel'] > 30 || $_POST['userlevel'] < 1) {
-        $level_error = "Please select a User Level.";
-        $error_flag = true;
-    }
-
-    // DELETIONS
-    if(isset($_POST['delete'])) {
-        try {
-            
-            $query = "DELETE FROM users WHERE userid = :userid";
-            $statement = $db->prepare($query);
-            $statement->bindValue(':userid', $userid, PDO::PARAM_INT);
-            $statement->execute();
-
-            header("Location: users.php");
-            exit;
-
-        } catch (Exception $exception) {
-            echo "Deletion failed: " . $exception->getMessage();
-        }
     }
 
     // UPDATES
@@ -96,19 +107,7 @@ if ($_POST &&
         } catch (Exception $exception) {
             echo "Update failed: " . $exception->getMessage();
         }
-    }
-    
-} else if(isset($_GET['userid'])) {
-    $userid = filter_input(INPUT_GET,'userid', FILTER_SANITIZE_NUMBER_INT);
-
-    $query = "SELECT * FROM users WHERE userid = :userid LIMIT 1";
-    $statement = $db->prepare($query);
-    $statement->bindValue(':userid', $userid, PDO::PARAM_INT);
-    $statement->execute();
-    $post = $statement->fetch();
-
-} else {
-    $userid = false;
+    }   
 }
 
 ?>
@@ -118,7 +117,7 @@ if ($_POST &&
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Registration</title>
+    <title>Update User</title>
 </head>
 <body>
     <a href="users.php">Users</a>
@@ -128,7 +127,7 @@ if ($_POST &&
                 <input type="hidden" name="userid" value="<?= $post['userid'] ?>">
                 <p>
                     <label for="username">Username</label>
-                    <input type="text" id="username" name="username" value="<?= $post['username'] ?>"required>
+                    <input type="text" id="username" name="username" value="<?= empty($username) ? $post['username'] : $username?>"required>
                     <?= $u_error ?>
                 </p>
                 <p>
@@ -138,6 +137,7 @@ if ($_POST &&
                 <p>
                     <label for="confirmpassword">Confirm Password</label>
                     <input type="password" id="confirmpassword" name="confirmpassword" placeholder="Use existing password">
+                    <?= $ps_error ?>
                 </p>
                 <p>
                     <label for="userlevel">User Level</label>
@@ -153,6 +153,8 @@ if ($_POST &&
                 </p>
             </fieldset>
         </form>
+    <?php else: ?>
+        <p>No User selected. Click <a href="users.php">here</a> to return to the User Management page.</p>
     <?php endif ?>
 </body>
 </html>
