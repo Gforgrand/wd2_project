@@ -34,11 +34,6 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
         $error_flag = true;
     }
 
-    if (empty($_POST['userlevel'])) {
-        $level_error = "Please select a User Level.";
-        $error_flag = true;
-    }
-
     if (!$error_flag) {
         try{
 
@@ -90,12 +85,12 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
             <p>
                 <label for="userlevel">User Level</label>
                 <select name="userlevel" id="userlevel">
-                    <option value="10">Commenter (10)</option>
+                    <option value="10" selected>Commenter (10)</option>
                     <option value="20">Contributor (20)</option>
                     <option value="30">Administrator (30)</option>
                 </select>
             </p>
-            <input type="submit" value="Register"><?= $level_error ?>
+            <input type="submit" value="Register">
         </fieldset>
     </form>
 </body>
