@@ -19,7 +19,6 @@
     $loggedout = filter_input(INPUT_GET,'loggedout', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $accessdenied = filter_input(INPUT_GET,'accessdenied', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $registered = filter_input(INPUT_GET,'registered', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $usermgmt = filter_input(INPUT_GET,'managed', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
 
 
     $query =
@@ -83,11 +82,6 @@
     <?php if (null !== $accessdenied): ?>
         <script>
             alert("You do not have permission to access this. Please log in with the appropriate credentials.");
-        </script>
-    <?php endif ?>
-    <?php if (null !== $usermgmt): ?>
-        <script>
-            alert("User modified.");
         </script>
     <?php endif ?>
 </body>
