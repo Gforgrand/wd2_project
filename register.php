@@ -86,8 +86,6 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
                 <label for="userlevel">User Level</label>
                 <select name="userlevel" id="userlevel">
                     <option value="10" selected>Commenter (10)</option>
-                    <option value="20">Contributor (20)</option>
-                    <option value="30">Administrator (30)</option>
                 </select>
             </p>
             <input type="submit" value="Register">
