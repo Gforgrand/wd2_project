@@ -21,8 +21,6 @@
 
         $content = filter_input(INPUT_POST, 'content', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
         $cardid = filter_input(INPUT_POST, 'cardid', FILTER_SANITIZE_NUMBER_INT);
-
-        echo "Received Card ID: " . $cardid;
         
         $query = "INSERT INTO comments (cardid, username, content) VALUES (:cardid, :username, :content)";
         $statement = $db->prepare($query);
