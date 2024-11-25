@@ -37,7 +37,8 @@
         'Power' => $row['power'],
         'Toughness' => $row['toughness'],
         'Set' => $row['cardsetname']
-    ]; 
+    ];
+
 ?>
 
 <!DOCTYPE html>
@@ -74,7 +75,12 @@
             <fieldset>
                 <p>
                     <label for="content">Comment</label>
-                    <textarea id="content" name="content"></textarea>
+                    <textarea id="content" name="content"><?= isset($_SESSION['content']) ? $_SESSION['content'] : '' ?></textarea>
+                </p>
+                <p>
+                    <img src="captcha.php" alt="CAPTCHA">
+                    <input type="text" name="captcha" placeholder="Enter CAPTCHA">
+                    <?= isset($_SESSION['captcha_error']) ? $_SESSION['captcha_error'] : '' ?>
                 </p>
                 <input type="submit" name="comment" value="Comment">
             </fieldset>
