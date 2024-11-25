@@ -51,7 +51,9 @@
     </div>
     <ul id="menu">
         <li><a href="index.php">Home</a></li>
-        <li><a href="insert.php">Add Card</a></li>
+        <?php if (isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 20): ?>
+            <li><a href="insert.php">Add Card</a></li>
+        <?php endif ?>
     </ul>
     <h2><?= $row['cardname'] ?></h2>
     <p><small><a href="edit.php?cardid=<?= $row['cardid'] ?>">edit</a></small></p>
