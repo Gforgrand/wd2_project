@@ -8,18 +8,21 @@
 
 ****************/
 
+session_start();
+
 require('connect.php');
 
-$u_error = $ps_error = $level_error = "";
+$u_error = $ps_error = $captcha_error = "";
 $error_flag = false;
 
-if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']))) {
+if ($_POST) {
     $username = filter_input(INPUT_POST, 'username', FILTER_VALIDATE_EMAIL);
     $password = filter_input(INPUT_POST, 'password', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
     $confirmpassword = filter_input(INPUT_POST, 'confirmpassword', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
-    $userlevel = filter_input(INPUT_POST, 'userlevel', FILTER_SANITIZE_NUMBER_INT);
+    $captcha = filter_input(INPUT_POST, 'captcha', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+    $userlevel = 10;
 
-    if ($password !== $confirmpassword) {
+    if (empty(trim($_POST['password'])) || $password !== $confirmpassword) {
         $ps_error = "Passwords do not match. Please ensure passwords match to continue.";
         $error_flag = true;
     }
@@ -34,7 +37,7 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
         $error_flag = true;
     }
 
-    if (!$error_flag) {
+    if (!$error_flag && !empty(trim($captcha)) && $captcha == $_SESSION['captcha']) {
         try{
 
             $password = password_hash($password, PASSWORD_DEFAULT);
@@ -45,6 +48,9 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
             $statement->bindValue(':password', $password, PDO::PARAM_STR);
             $statement->bindValue(':userlevel', $userlevel, PDO::PARAM_INT);
             $statement->execute();
+
+            $_SESSION['captcha'] = '';
+            unset($_SESSION['captcha']);
     
             header("Location: index.php?registered");
             exit;
@@ -52,6 +58,10 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
         } catch (Exception $exception) {
             echo $exception->getMessage();
         }
+    } 
+    
+    if (empty(trim($captcha)) || $captcha != $_SESSION['captcha']) {
+        $captcha_error = "Please try the CAPTCHA again.";
     }
 }
 
@@ -70,23 +80,22 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
         <fieldset>
             <p>
                 <label for="username">Username</label>
-                <input type="text" id="username" name="username" required>
+                <input type="text" id="username" name="username" value="<?= isset($_POST['username']) ? $_POST['username'] : ''?>">
                 <?= $u_error ?>
             </p>
             <p>
                 <label for="password">Password</label>
-                <input type="password" id="password" name="password" required>
+                <input type="password" id="password" name="password" value="<?= isset($_POST['password']) ? $_POST['password'] : ''?>">
             </p>
             <p>
                 <label for="confirmpassword">Confirm Password</label>
-                <input type="password" id="confirmpassword" name="confirmpassword" required>
+                <input type="password" id="confirmpassword" name="confirmpassword" value="<?= isset($_POST['confirmpassword']) ? $_POST['confirmpassword'] : ''?>">
                 <?= $ps_error ?>
             </p>
             <p>
-                <label for="userlevel">User Level</label>
-                <select name="userlevel" id="userlevel">
-                    <option value="10" selected>Commenter (10)</option>
-                </select>
+                <img src="captcha.php" alt="CAPTCHA">
+                <input type="text" name="captcha" placeholder="Enter CAPTCHA">
+                <?= $captcha_error ?>
             </p>
             <input type="submit" value="Register">
         </fieldset>
