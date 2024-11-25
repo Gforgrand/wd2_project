@@ -39,14 +39,12 @@ $statement->execute();
             <th></th>
             <th>Username</th>
             <th>User Level</th>
-            <th>Password (Salted and Hashed)</th>
         </tr>
         <?php while($row = $statement->fetch()): ?>
             <tr>
-                <td><a href="user_edit.php?userid=<?= $row['userid'] ?>">UPDATE</a></td>
+                <td><a href="user_edit.php?userid=<?= $row['userid'] ?>">EDIT</a></td>
                 <td><?= $row['username'] ?></td>
                 <td><?= $row['userlevel']?></td>
-                <td><?= $row['password']?></td>
             </tr>
         <?php endwhile ?>
     </table>
