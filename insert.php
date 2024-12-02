@@ -11,6 +11,7 @@
     session_start();
 
     require('connect.php');
+    require('image_upload.php');
     require('get_or_create.php');
 
     if (!isset($_SESSION['userlevel']) || $_SESSION['userlevel'] < 20) {
@@ -30,11 +31,15 @@
     $statement_cardsets = $db->prepare($query_cardsets);
     $statement_cardsets->execute();
 
-    if(
+    if (
         $_POST &&
+        isset($_POST['cardname']) &&
+        isset($_POST['cardtypename']) &&
+        isset($_POST['cardsetname']) &&
         !empty(trim($_POST['cardname'])) &&
         !empty(trim($_POST['cardtypename'])) &&
-        !empty(trim($_POST['cardsetname']))
+        !empty(trim($_POST['cardsetname'])) &&
+        !isset($_POST['image_insert'])
         ) {
 
         $cardname = filter_input(INPUT_POST, 'cardname', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
@@ -72,6 +77,18 @@
                 $statement->execute();
             }
 
+            if (isset($_SESSION['imageid'])) {
+                $query = "UPDATE images SET cardid = :cardid WHERE imageid = :imageid";
+                $statement = $db->prepare($query);
+                $statement->bindValue(':cardid', $cardid, PDO::PARAM_INT);
+                $statement->bindValue(':imageid', $_SESSION['imageid'], PDO::PARAM_INT);
+                $statement->execute();
+                $_SESSION['imageid'] = '';
+                unset($_SESSION['imageid']);
+                $_SESSION['image_filename'] = '';
+                unset($_SESSION['image_filename']);
+            }
+
             $db->commit();
 
             header("Location: index.php?success");
@@ -96,9 +113,17 @@
     <h1><a href="index.php">Magic: The Gathering CMS - New Card</a></h1>
     <ul id="menu">
         <li><a href="index.php">Home</a></li>
-        <li><a href="insert.php" class="active">Add Card</a></li>
-    </ul> 
-    <form action="insert.php" method="post">
+    </ul>
+    <p>
+        N.B.: Upload the optional image before filling out the rest of the form. 
+    </p>
+    <form id="image_insert" method="post" enctype="multipart/form-data">
+        <input type="hidden" name="image_insert">
+        <label for="image">Image Filename:</label>
+        <input type="file" name="image" id="image">
+        <input type="submit" name="submit" value="Upload Image">
+    </form>
+    <form id="insert" action="insert.php" method="post">
         <fieldset>
             <p>
                 <label for="cardname">Card Name</label>
@@ -165,14 +190,23 @@
             </p>
             <input type="submit">
             <?php if (
-                $_POST &&
-                empty(trim($_POST['cardname'])) &&
-                empty(trim($_POST['cardtypename'])) &&
-                empty(trim($_POST['cardsetname']))
-            ): ?>
+                    $_POST &&
+                    isset($_POST['cardname']) &&
+                    isset($_POST['cardtypename']) &&
+                    isset($_POST['cardsetname']) &&
+                    empty(trim($_POST['cardname'])) &&
+                    empty(trim($_POST['cardtypename'])) &&
+                    empty(trim($_POST['cardsetname'])) &&
+                    !isset($_POST['image_insert'])
+                ): ?>
                 <p class="warning">The Card Name, Cardtype, and Set must each contain at least 1 non-whitespace character.</p>
             <?php endif ?>
         </fieldset>
     </form>
+    <?php if (isset($_SESSION['upload_message'])): ?>
+        <script> alert("<?= $_SESSION['upload_message'] ?>"); </script>
+        <?php $_SESSION['upload_message'] = '' ?>
+        <?php unset($_SESSION['upload_message']) ?>
+    <?php endif ?>
 </body>
 </html>

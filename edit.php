@@ -11,6 +11,7 @@
     session_start();
     
     require('connect.php');
+    require('image_upload.php');
     require('get_or_create.php');
 
     if (!isset($_SESSION['userlevel']) || $_SESSION['userlevel'] < 20) {
@@ -63,6 +64,28 @@
                 $statement->bindValue(':cardid', $cardid, PDO::PARAM_INT);
                 $statement->execute();
 
+                $query = "SELECT filename FROM images WHERE cardid = :cardid LIMIT 1";
+                $statement = $db->prepare($query);
+                $statement->bindValue(':cardid', $cardid, PDO::PARAM_INT);
+                $statement->execute();
+                $image = $statement->fetch();
+
+                if ($image && !empty($image['filename'])) {
+                    $image_path = file_upload_path($_POST['filename']);
+
+                    if (file_exists($image_path)) {
+                        unlink($image_path);
+                    }
+                    
+                    $query = "DELETE FROM images WHERE cardid = :cardid";
+                    $statement = $db->prepare($query); 
+                    $statement->bindValue(':cardid', $cardid, PDO::PARAM_INT);  
+                    $statement->execute(); 
+
+                    $_SESSION['upload_message'] = '';
+                    unset($_SESSION['upload_message']);
+                }
+
                 $query = "DELETE FROM cards WHERE cardid = :cardid LIMIT 1";
                 $statement = $db->prepare($query);
                 $statement->bindValue(':cardid', $cardid, PDO::PARAM_INT);
@@ -106,6 +129,42 @@
                 $statement->execute();
             }
 
+            $query_images = "SELECT COUNT(*) FROM images WHERE cardid = :cardid";
+            $statement_images = $db->prepare($query_images);
+            $statement_images->bindValue(':cardid', $cardid, PDO::PARAM_INT);
+            $statement_images->execute();
+            $count_images = $statement_images->fetchColumn();
+
+            if (isset($_SESSION['imageid']) && $count_images == 0) {
+                $query = "UPDATE images SET cardid = :cardid WHERE imageid = :imageid";
+                $statement = $db->prepare($query);
+                $statement->bindValue(':cardid', $cardid, PDO::PARAM_INT);
+                $statement->bindValue(':imageid', $_SESSION['imageid'], PDO::PARAM_INT);
+                $statement->execute();
+                $_SESSION['imageid'] = '';
+                unset($_SESSION['imageid']);
+                $_SESSION['image_filename'] = '';
+                unset($_SESSION['image_filename']);
+            } else {
+                $_SESSION['upload_message'] = "This card already has an image!";
+            }
+
+            if (isset($_POST['delete_image']) && $_POST['delete_image'] == '1') {
+                if (isset($_POST['filename']) && !empty($_POST['filename'])) {
+                    $image_path = file_upload_path($_POST['filename']);
+
+                    if (file_exists($image_path)) {
+                        unlink($image_path);
+                    }
+                    
+                    $query = "DELETE FROM images WHERE cardid = :cardid";
+                    $statement = $db->prepare($query); 
+                    $statement->bindValue(':cardid', $cardid, PDO::PARAM_INT);  
+                    $statement->execute(); 
+                    $_SESSION['upload_message'] = "Image deleted!";
+                }
+            }
+
             $db->commit();
 
             header("Location: index.php?updated");
@@ -118,13 +177,14 @@
     } else if(isset($_GET['cardid'])) {
         $cardid = filter_input(INPUT_GET,'cardid', FILTER_SANITIZE_NUMBER_INT);
 
-        $query = "SELECT c.*, t.cardtypeid, m.manaid, s.cardsetid
+        $query = "SELECT c.*, t.cardtypeid, m.manaid, s.cardsetid, i.filename
                  FROM cards c
                  JOIN cardtypes t ON c.cardtypeid = t.cardtypeid
                  LEFT JOIN cardcosts cc ON c.cardid = cc.cardid
                  LEFT JOIN manacolours m ON cc.manaid = m.manaid
                  LEFT JOIN cardsetcards cs ON c.cardid = cs.cardid
                  LEFT JOIN cardsets s ON cs.cardsetid = s.cardsetid
+                 LEFT JOIN images i ON c.cardid = i.cardid
                  WHERE c.cardid = :cardid LIMIT 1";
         $statement = $db->prepare($query);
         $statement->bindValue(':cardid', $cardid, PDO::PARAM_INT);
@@ -146,9 +206,9 @@
 </head>
 <body>
     <div id="header">
+        <h1><a href="index.php">Magic: The Gathering CMS - Edit Card</a></h1>
         <ul id="menu">
             <li><a href="index.php">Home</a></li>
-            <li><a href="edit.php" class="active">Edit Card</a></li>
         </ul> 
     </div>
     <?php if ($cardid && isset($post) && $post): ?>
@@ -167,13 +227,17 @@
                                 <?= $row['cardtypename'] ?>
                             </option>
                         <?php endwhile ?>
-                        <option value="new">Add New Cardtype</option>
+                        <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                            <option value="new">Add New Cardtype</option>
+                        <?php endif ?>
                     </select>
                 </p>
-                <p>
-                    <label for="newcardtype">New Cardtype</label>
-                    <input type="text" id="newcardtype" name="newcardtype">
-                </p>
+                <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                    <p>
+                        <label for="newcardtype">New Cardtype</label>
+                        <input type="text" id="newcardtype" name="newcardtype">
+                    </p>
+                <?php endif ?>
                 <p>
                     <label for="colourname">Card Cost</label>
                     <select name="colourname" id="colourname">
@@ -182,13 +246,17 @@
                                 <?= $row['colourname'] ?>
                             </option>
                         <?php endwhile ?>
-                        <option value="new">Add New Card Cost</option>
+                        <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                            <option value="new">Add New Card Cost</option>
+                        <?php endif ?>
                     </select>
                 </p>
-                <p>
-                    <label for="newcolourname">New Card Cost</label>
-                    <input type="text" id="newcolourname" name="newcolourname">
-                </p>
+                <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                    <p>
+                        <label for="newcolourname">New Card Cost</label>
+                        <input type="text" id="newcolourname" name="newcolourname">
+                    </p>
+                <?php endif ?>
                 <p>
                     <label for="cardsetname">Set</label>
                     <select name="cardsetname" id="cardsetname">
@@ -197,13 +265,17 @@
                                 <?= $row['cardsetname'] ?>
                             </option>
                         <?php endwhile ?>
-                        <option value="new">Add New Set</option>
+                        <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                            <option value="new">Add New Set</option>
+                        <?php endif ?>
                     </select>
                 </p>
-                <p>
-                    <label for="newcardset">New Set</label>
-                    <input type="text" id="newcardset" name="newcardset">
-                </p>
+                <?php if(isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 30): ?>
+                    <p>
+                        <label for="newcardset">New Set</label>
+                        <input type="text" id="newcardset" name="newcardset">
+                    </p>
+                <?php endif ?>
                 <p>
                     <label for="power">Power</label>
                     <textarea id="power" name="power"><?= $post['power'] ?></textarea>
@@ -212,20 +284,44 @@
                     <label for="toughness">Toughness</label>
                     <textarea id="toughness" name="toughness"><?= $post['toughness'] ?></textarea>
                 </p>
+                <?php if (!empty($post['filename'])): ?>
+                    <input type="hidden" name="filename" value="<?= $post['filename'] ?>">
+                    <img src="uploads/<?= $post['filename'] ?>" alt="<?= $post['cardname'] ?>">
+                    <label for="delete_image">
+                        <input type="checkbox" name="delete_image" value="1"> Delete this image
+                    </label>
+                <?php endif ?>
                 <input type="submit" name="update" value="Update">
                 <button type="submit" name="delete" value="Delete" onclick="return confirm('Are you sure you want to delete this card?')">Delete</button>
                 <?php if (
                     $_POST &&
+                    isset($_POST['cardname']) &&
+                    isset($_POST['cardtypename']) &&
+                    isset($_POST['cardsetname']) &&
                     empty(trim($_POST['cardname'])) &&
                     empty(trim($_POST['cardtypename'])) &&
-                    empty(trim($_POST['cardsetname']))
+                    empty(trim($_POST['cardsetname'])) &&
+                    !isset($_POST['image_insert'])
                 ): ?>
                     <p class="warning">The Card Name, Cardtype, and Set must each contain at least 1 non-whitespace character.</p>
                 <?php endif ?>
             </fieldset>
         </form>
+        <?php if (empty($post['filename'])): ?>
+            <form id="image_insert" method="post" enctype="multipart/form-data">
+                <input type="hidden" name="image_insert">
+                <label for="image">Image Filename:</label>
+                <input type="file" name="image" id="image">
+                <input type="submit" name="submit" value="Upload Image">
+            </form>
+        <?php endif ?>
     <?php else: ?>
         <p>No Card Selected.</p>
+    <?php endif ?>
+    <?php if (isset($_SESSION['upload_message']) && $_SESSION['upload_message'] != "Image deleted!"): ?>
+        <script> alert("<?= $_SESSION['upload_message'] ?>"); </script>
+        <?php $_SESSION['upload_message'] = '' ?>
+        <?php unset($_SESSION['upload_message']) ?>
     <?php endif ?>
 </body>
 </html>

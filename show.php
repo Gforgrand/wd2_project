@@ -18,13 +18,14 @@
     $comments_statement->bindValue('cardid', $cardid, PDO::PARAM_INT);
     $comments_statement->execute();
 
-    $query = "SELECT c.*, t.cardtypename, m.colourname, s.cardsetname
+    $query = "SELECT c.*, t.cardtypename, m.colourname, s.cardsetname, i.filename
               FROM cards c
               JOIN cardtypes t ON c.cardtypeid = t.cardtypeid
               LEFT JOIN cardcosts cc ON c.cardid = cc.cardid
               LEFT JOIN manacolours m ON cc.manaid = m.manaid
               LEFT JOIN cardsetcards cs ON c.cardid = cs.cardid
               LEFT JOIN cardsets s ON cs.cardsetid = s.cardsetid
+              LEFT JOIN images i ON c.cardid = i.cardid
               WHERE c.cardid = :cardid LIMIT 1";
     $statement = $db->prepare($query);
     $statement->bindValue('cardid', $cardid, PDO::PARAM_INT);
@@ -56,9 +57,6 @@
     </div>
     <ul id="menu">
         <li><a href="index.php">Home</a></li>
-        <?php if (isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 20): ?>
-            <li><a href="insert.php">Add Card</a></li>
-        <?php endif ?>
     </ul>
     <h2><?= $row['cardname'] ?></h2>
     <?php if (isset($_SESSION['userlevel']) && $_SESSION['userlevel'] >= 20): ?>
@@ -69,6 +67,9 @@
             <p><?= $label ?>: <?= $value ?></p>
         <?php endif ?>
     <?php endforeach ?>
+    <?php if (!empty($row['filename'])): ?>
+        <img src="uploads/<?= $row['filename'] ?>" alt="<?= $row['cardname'] ?>">
+    <?php endif ?>
     <?php if (isset($_SESSION['username'])): ?>
         <form action=comment_insert.php method="post">
             <input type="hidden" name="cardid" value="<?= $row['cardid'] ?>">
