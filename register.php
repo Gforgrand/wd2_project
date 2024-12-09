@@ -10,7 +10,7 @@
 
 session_start();
 
-require('connect.php');
+require('search_logic.php');
 
 $u_error = $ps_error = $captcha_error = "";
 $error_flag = false;
@@ -75,7 +75,7 @@ if ($_POST) {
     <title>Registration</title>
 </head>
 <body>
-    <?php include 'search.php'; ?>
+    <?php include 'search.php' ?>
     <a href="index.php">Home</a>
     <form method="post">
         <fieldset>

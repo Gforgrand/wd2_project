@@ -10,7 +10,7 @@
 
 session_start();
 
-require('connect.php');
+require('search_logic.php');
 
 $login_error = "";
 
@@ -48,7 +48,7 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
     <title>Login</title>
 </head>
 <body>
-    <?php include 'search.php'; ?>
+    <?php include 'search.php' ?>
     <a href="index.php">Home</a>
     <form method="post">
         <fieldset>

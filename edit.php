@@ -10,7 +10,7 @@
 
     session_start();
     
-    require('connect.php');
+    require('search_logic.php');
     require('image_upload.php');
     require('get_or_create.php');
 
@@ -18,18 +18,6 @@
         header("Location: index.php?accessdenied");
         exit;
     }
-
-    $query_cardtypes = "SELECT * FROM cardtypes";
-    $statement_cardtypes = $db->prepare($query_cardtypes);
-    $statement_cardtypes->execute();
-
-    $query_manacolours = "SELECT * FROM manacolours";
-    $statement_manacolours = $db->prepare($query_manacolours);
-    $statement_manacolours->execute();
-
-    $query_cardsets = "SELECT * FROM cardsets";
-    $statement_cardsets = $db->prepare($query_cardsets);
-    $statement_cardsets->execute();
 
     if ($_POST &&
         isset($_POST['cardname']) &&
@@ -205,7 +193,7 @@
     <title>Change Card</title>
 </head>
 <body>
-    <?php include 'search.php'; ?>
+    <?php include 'search.php' ?>
     <div id="header">
         <h1><a href="index.php">Magic: The Gathering CMS - Edit Card</a></h1>
         <ul id="menu">

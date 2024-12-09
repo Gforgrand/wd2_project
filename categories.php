@@ -10,24 +10,12 @@
 
 session_start();
 
-require('connect.php');
+require('search_logic.php');
 
 if (!isset($_SESSION['userlevel']) || $_SESSION['userlevel'] < 30) {
     header("Location: index.php?accessdenied");
     exit;
 }
-
-$query_cardtypes = "SELECT * FROM cardtypes";
-$statement_cardtypes = $db->prepare($query_cardtypes);
-$statement_cardtypes->execute();
-
-$query_manacolours = "SELECT * FROM manacolours";
-$statement_manacolours = $db->prepare($query_manacolours);
-$statement_manacolours->execute();
-
-$query_cardsets = "SELECT * FROM cardsets";
-$statement_cardsets = $db->prepare($query_cardsets);
-$statement_cardsets->execute();
 
 function sanitize_and_update($table, $fieldname, $newvalue, $idname, $db) {
 
@@ -77,7 +65,7 @@ if ($_POST) {
     <title>Categories</title>
 </head>
 <body>
-    <?php include 'search.php'; ?>
+    <?php include 'search.php' ?>
     <h1><a href="index.php">Magic: The Gathering CMS - New Card</a></h1>
     <h2>Categories</h2>
     <form method="post">

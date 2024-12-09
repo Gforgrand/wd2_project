@@ -9,7 +9,7 @@
 ****************/
 
     session_start();
-    require('connect.php');
+    require('search_logic.php');
 
     $cardid  = filter_input(INPUT_GET,'cardid', FILTER_SANITIZE_NUMBER_INT);
 
@@ -52,7 +52,7 @@
     <title>Card</title>
 </head>
 <body>
-    <?php include 'search.php'; ?>
+    <?php include 'search.php' ?>
     <div id="header">
         <h1><a href="index.php">Magic: The Gathering Content Management System</a></h1>
     </div>

@@ -10,7 +10,7 @@
 
 session_start();
     
-require('connect.php');
+require('search_logic.php');
 
 if (!isset($_SESSION['userlevel']) || $_SESSION['userlevel'] < 30) {
     header("Location: index.php?accessdenied");
@@ -31,7 +31,7 @@ $statement->execute();
     <title>User Management</title>
 </head>
 <body>
-    <?php include 'search.php'; ?>
+    <?php include 'search.php' ?>
     <h1><a href="index.php">Magic: The Gathering Content Management System</a></h1>
     <h2>Users</h2>
     <p><a href="user_create.php">CREATE USER</a></p>

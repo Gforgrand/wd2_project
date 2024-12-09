@@ -10,7 +10,7 @@
 
 session_start();
 
-require('connect.php');
+require('search_logic.php');
 
 if (!isset($_SESSION['userlevel']) || $_SESSION['userlevel'] < 30) {
     header("Location: index.php?accessdenied");
@@ -120,7 +120,7 @@ if ($_POST &&
     <title>Update User</title>
 </head>
 <body>
-    <?php include 'search.php'; ?>
+    <?php include 'search.php' ?>
     <a href="users.php">Users</a>
     <?php if ($userid && isset($post) && $post): ?>
         <form method="post">

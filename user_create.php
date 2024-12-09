@@ -10,7 +10,7 @@
 
 session_start();
 
-require('connect.php');
+require('search_logic.php');
 
 if (!isset($_SESSION['userlevel']) || $_SESSION['userlevel'] < 30) {
     header("Location: index.php?accessdenied");
@@ -72,7 +72,7 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
     <title>Create User</title>
 </head>
 <body>
-    <?php include 'search.php'; ?>
+    <?php include 'search.php' ?>
     <a href="users.php">Users</a>
     <form method="post">
         <fieldset>

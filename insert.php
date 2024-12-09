@@ -10,7 +10,7 @@
 
     session_start();
 
-    require('connect.php');
+    require('search_logic.php');
     require('image_upload.php');
     require('get_or_create.php');
 
@@ -110,7 +110,7 @@
     <title>Add Card</title>
 </head>
 <body>
-    <?php include 'search.php'; ?>
+    <?php include 'search.php' ?>
     <h1><a href="index.php">Magic: The Gathering CMS - New Card</a></h1>
     <ul id="menu">
         <li><a href="index.php">Home</a></li>
