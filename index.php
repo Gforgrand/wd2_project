@@ -53,6 +53,11 @@
     $bindings = [];
 
     if ($_GET) {
+        if (isset($_GET['search'])) {
+            $search = filter_input(INPUT_GET, 'search', FILTER_SANITIZE_FULL_SPECIAL_CHARS);
+            $query .= " AND c.cardname LIKE :search";
+        }    
+        
         if (isset($_GET['cardtypename']) && $_GET['cardtypename'] != 0) {
             $cardtypename = filter_input(INPUT_GET, 'cardtypename', FILTER_SANITIZE_NUMBER_INT);
             $query .= " AND t.cardtypeid = :cardtypename";
@@ -76,9 +81,14 @@
     foreach ($bindings as $key => $value) {
         $statement->bindValue($key, $value, PDO::PARAM_INT);
     }
+    if (isset($_GET['search'])) {
+        $statement->bindValue(':search', '%' . $search . '%', PDO::PARAM_STR);
+    }
     $statement->execute();
 
     if (isset($_GET['clear'])) {
+        $_GET['search'] = '';
+        unset($_GET['search']);
         header("Location: index.php?cardtypename=0&colourname=0&cardsetname=0");
         exit;
     }
@@ -95,6 +105,7 @@
     <title>Welcome to the Magic: The Gathering Content Management System!</title>
 </head>
 <body>
+    <?php include 'search.php'; ?>
     <div id="header">
         <?php foreach ($messages as $message): ?>
             <?php if (null !==$message['condition']): ?>

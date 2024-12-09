@@ -31,9 +31,10 @@ $statement->execute();
     <title>User Management</title>
 </head>
 <body>
-<h1><a href="index.php">Magic: The Gathering Content Management System</a></h1>
-<h2>Users</h2>
-<p><a href="user_create.php">CREATE USER</a></p>
+    <?php include 'search.php'; ?>
+    <h1><a href="index.php">Magic: The Gathering Content Management System</a></h1>
+    <h2>Users</h2>
+    <p><a href="user_create.php">CREATE USER</a></p>
     <table>
         <tr>
             <th></th>

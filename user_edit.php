@@ -120,6 +120,7 @@ if ($_POST &&
     <title>Update User</title>
 </head>
 <body>
+    <?php include 'search.php'; ?>
     <a href="users.php">Users</a>
     <?php if ($userid && isset($post) && $post): ?>
         <form method="post">

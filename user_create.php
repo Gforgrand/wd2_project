@@ -72,6 +72,7 @@ if ($_POST && !empty(trim($_POST['username'])) && !empty(trim($_POST['password']
     <title>Create User</title>
 </head>
 <body>
+    <?php include 'search.php'; ?>
     <a href="users.php">Users</a>
     <form method="post">
         <fieldset>

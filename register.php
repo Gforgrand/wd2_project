@@ -75,6 +75,7 @@ if ($_POST) {
     <title>Registration</title>
 </head>
 <body>
+    <?php include 'search.php'; ?>
     <a href="index.php">Home</a>
     <form method="post">
         <fieldset>

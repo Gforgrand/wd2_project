@@ -77,6 +77,7 @@ if ($_POST) {
     <title>Categories</title>
 </head>
 <body>
+    <?php include 'search.php'; ?>
     <h1><a href="index.php">Magic: The Gathering CMS - New Card</a></h1>
     <h2>Categories</h2>
     <form method="post">

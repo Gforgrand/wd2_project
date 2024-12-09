@@ -110,6 +110,7 @@
     <title>Add Card</title>
 </head>
 <body>
+    <?php include 'search.php'; ?>
     <h1><a href="index.php">Magic: The Gathering CMS - New Card</a></h1>
     <ul id="menu">
         <li><a href="index.php">Home</a></li>
@@ -197,7 +198,8 @@
                     empty(trim($_POST['cardname'])) &&
                     empty(trim($_POST['cardtypename'])) &&
                     empty(trim($_POST['cardsetname'])) &&
-                    !isset($_POST['image_insert'])
+                    !isset($_POST['image_insert']) &&
+                    !isset($_GET['keyword'])
                 ): ?>
                 <p class="warning">The Card Name, Cardtype, and Set must each contain at least 1 non-whitespace character.</p>
             <?php endif ?>

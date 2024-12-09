@@ -52,6 +52,7 @@
     <title>Card</title>
 </head>
 <body>
+    <?php include 'search.php'; ?>
     <div id="header">
         <h1><a href="index.php">Magic: The Gathering Content Management System</a></h1>
     </div>
